@@ -1,0 +1,13 @@
+mode   design             LUT      FF    DSP   CARRY4    WNS_r2r    WNS_all
+dsp    mpmac_split       1046      48      0      158      1.402     -2.537
+dsp    mpmac_shared      1351      48      0      245       2.69     -6.353
+dsp    mpmac_rca         1496      48      0       64     -8.401    -11.259
+dsp    mpmac_ksa         2262      48      0       64      1.136     -9.512
+dsp    mac_separate       463      96      1       66      7.526      3.932
+dsp    mac_fixed16          2       0      1        0        n/a      5.267
+nodsp  mpmac_split       1046      48      0      158      1.402     -2.537
+nodsp  mpmac_shared      1351      48      0      245       2.69     -6.353
+nodsp  mpmac_rca         1496      48      0       64     -8.401    -11.259
+nodsp  mpmac_ksa         2262      48      0       64      1.136     -9.512
+nodsp  mac_separate       948     144      0      150      6.744      0.619
+nodsp  mac_fixed16        502      48      0       84      6.755      0.604

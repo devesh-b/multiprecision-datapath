@@ -1,0 +1,22 @@
+# V1 (mpmac_split) == V2 (mpmac_shared), all modes, all inputs, all state.
+#
+# Both instantiate the same mp_frontend, so eqy matches the 16 sub-products and
+# the remaining obligation is "do these two reduction networks compute the same
+# next state" -- not "are two 16x16 multipliers equal", which is the query that
+# does not close.
+
+[options]
+
+[gold]
+read -sv ../rtl/mpmac.v
+prep -top mpmac_split -flatten
+rename mpmac_split mpmac
+
+[gate]
+read -sv ../rtl/mpmac.v
+prep -top mpmac_shared -flatten
+rename mpmac_shared mpmac
+
+[strategy simple]
+use sat
+depth 2
