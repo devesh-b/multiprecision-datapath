@@ -136,6 +136,50 @@ The cost model is deliberately crude (multiplier 100, adder 10). It only has to
 rank one multiply against two; ARITH 2022 uses a two-input-gate estimate
 parameterised by operand width, and validates it against logic synthesis.
 
+## Does the verdict move with operand width?
+
+At 16 bits the shared multi-precision MAC and seven dedicated units are within
+a couple of percent of each other. The whole premise of width-dependent
+optimality is that such a result does not transfer, so `rtl/mpmac_gen.v`
+generalises the architecture over operand width and `sweep_width.sh` re-measures
+it. Verified at all three widths against a golden model first — 120,000 checks
+each, zero errors, for both the shared design and the dedicated baseline.
+
+Structure-preserving counts (`proc/opt/techmap/opt`), which complete at every
+width:
+
+| W | shared `mpmac_gen` | dedicated `mac_sep_gen` | ratio | shared depth | dedicated depth |
+|---|---|---|---|---|---|
+| 16 | 7583 | 4535 | **1.67×** | 295 | 275 |
+| 32 | 42574 | 14243 | **2.99×** | 614 | 561 |
+| 64 | 235744 | 47527 | **4.96×** | 1321 | 1135 |
+
+**The verdict moves, and it moves hard against the shared design.** Its cost
+grows roughly as W^2.5 while the dedicated baseline grows as W^1.7, so the gap
+triples between 16 and 64 bits.
+
+The mechanism is the reduction network, not the multipliers. Sub-products are
+always 4×4 and there are (W/4)² of them — quadratic, matching the dedicated
+multiplier. But every one of them is *placed into a full 3W-bit accumulator
+field* before being summed, so the adder tree carries (W/4)² terms of 3W bits:
+**cubic in W**. A dedicated multiplier reduces its partial products at their
+natural narrow width and only widens at the end.
+
+That is a fixable architectural mistake rather than a fact about multi-precision
+arithmetic: reducing sub-products within their lane before placing them, the way
+a Wallace or Dadda tree does, would bring the reduction back to quadratic. This
+design does not do it, and at 16 bits the cost is invisible.
+
+**Confidence, stated honestly.** These are as-written counts. At W=16 ABC
+changes the answer — it takes the shared design from 7583 to 4322 and the
+dedicated from 4535 to 4398, turning a 1.67× loss into a marginal win. So
+technology mapping matters a great deal here, and only the shared design's ABC
+number is available at W=32 (17822 cells); the dedicated baseline's did not
+complete in 25 minutes, because technology-mapping a behavioural 32×32 multiply
+is expensive and 64×64 is worse. A ratio that triples is very unlikely to be a
+mapping artefact, but the 32- and 64-bit rows are indicative rather than
+settled, and saying otherwise would be overclaiming from one measured column.
+
 ## Limits
 
 - The accuracy study quantises the *inputs* and accumulates in double. Real
@@ -150,3 +194,10 @@ parameterised by operand width, and validates it against logic synthesis.
 - The width analysis tracks an upper bound, not a range. It cannot see that
   `b+c` fits because `b` and `c` happen to be small at runtime — only that
   their declared widths allow it.
+- The width study has ABC numbers at 16 bits only for both designs. The
+  cross-width conclusion rests on structure-preserving counts, which the 16-bit
+  row shows can differ from the mapped result in direction, not just magnitude.
+- `mpmac_gen` is a generalisation of the architecture, not the same netlist as
+  `mpmac_shared`: it folds the reduction linearly rather than as a balanced
+  tree. It is verified independently, but the two are not interchangeable and
+  their cell counts are not directly comparable.
