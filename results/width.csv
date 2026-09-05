@@ -1,7 +1,7 @@
-W,design,cells,depth,ff
-16,mpmac_gen,7583,295,48
-16,mac_sep_gen,4535,275,144
-32,mpmac_gen,42574,614,96
-32,mac_sep_gen,14243,561,288
-64,mpmac_gen,235744,1321,192
-64,mac_sep_gen,47527,1135,576
+W,design,cells_raw,depth_raw,ff,cells_abc,depth_abc
+16,mpmac_gen,7583,295,48,4322,250
+16,mac_sep_gen,4535,275,144,4398,255
+32,mpmac_gen,42574,614,96,17822,646
+32,mac_sep_gen,14243,561,288,14041,557
+64,mpmac_gen,235744,1321,192,,
+64,mac_sep_gen,47527,1135,576,,
