@@ -10,6 +10,7 @@ real FPGA flow (Vivado, Artix-7). The interesting part is that **the two flows
 disagree**, twice, and the generic-cell flow is the one that gets it wrong.
 
 Full design notes, numbers and analysis: **[DESIGN.md](DESIGN.md)**.
+Design-space exploration, number formats and a conditional rewrite: **[DSE.md](DSE.md)**.
 Standalone adder width study: **[SWEEP.md](SWEEP.md)**.
 
 ## Results in brief
@@ -28,6 +29,19 @@ Standalone adder width study: **[SWEEP.md](SWEEP.md)**.
   operand port, which is the honest case for it.
 - Equivalence checking found a real difference between the two architectures at
   an unused mode encoding that 1.47 M directed simulation vectors did not.
+
+## Also here
+
+- **A rewrite that needs a side-condition.** `a*b + a*c → a*(b+c)` is proved
+  equal with a widened intermediate, proved *unequal* with a truncated one, and
+  proved equal again once the no-overflow condition is assumed — the same
+  bitwidth side-conditions that ARITH 2022's rewrite table carries.
+- **14 synthesised design points** against measured accuracy: `M4` is 12×
+  cheaper per product than `M16` and 3800× less accurate, so narrow modes only
+  pay for themselves in an application that can absorb the error.
+- **Posit is second in both columns.** Fixed point wins on a bounded range and
+  fails on a wide one; posit(16,1) beats binary16 near 1 and loses to it across
+  8 decades. Tapered accuracy is a bet on where the data sits.
 
 ## Layout
 

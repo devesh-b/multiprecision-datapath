@@ -291,7 +291,8 @@ endmodule
 // ---------------------------------------------------------------------------
 module mpmac_locked #(
   parameter integer CPA  = 0,
-  parameter [1:0]   MODE = `MODE_M16
+  parameter [1:0]   MODE = `MODE_M16,
+  parameter integer ARCH = 0        // 0 = mpmac_shared, 1 = mpmac_split
 ) (
   input  wire        clk,
   input  wire        rst,
@@ -301,9 +302,18 @@ module mpmac_locked #(
   input  wire [15:0] b,
   output wire [47:0] acc
 );
-  mpmac_shared #(.CPA(CPA)) u (
-    .clk(clk), .rst(rst), .en(en), .sgn(sgn), .mode(MODE),
-    .a(a), .b(b), .acc(acc));
+  generate
+    if (ARCH == 0) begin : g_shared
+      mpmac_shared #(.CPA(CPA)) u (
+        .clk(clk), .rst(rst), .en(en), .sgn(sgn), .mode(MODE),
+        .a(a), .b(b), .acc(acc));
+    end else begin : g_split
+      // mpmac_split has no swappable CPA; it is one point, not a family
+      mpmac_split u (
+        .clk(clk), .rst(rst), .en(en), .sgn(sgn), .mode(MODE),
+        .a(a), .b(b), .acc(acc));
+    end
+  endgenerate
 endmodule
 
 // Named CPA variants. Distinct module names so the testbench (-DDUT=) and eqy

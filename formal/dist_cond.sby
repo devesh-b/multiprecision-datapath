@@ -1,0 +1,16 @@
+[options]
+mode bmc
+depth 1
+
+
+[engines]
+smtbmc z3
+
+[script]
+read -formal distribute.v
+read -formal miter_dist_cond.v
+prep -top miter_dist_cond
+
+[files]
+miter_dist_cond.v
+../rtl/distribute.v

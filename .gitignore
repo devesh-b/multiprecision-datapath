@@ -21,6 +21,9 @@ formal/equiv/
 formal/equiv_ks/
 formal/equiv_seg/
 formal/mpmac_eq/
+formal/dist_wide/
+formal/dist_narrow/
+formal/dist_cond/
 
 # Vivado
 vivado*/
