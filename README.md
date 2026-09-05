@@ -39,6 +39,10 @@ Standalone adder width study: **[SWEEP.md](SWEEP.md)**.
 - **14 synthesised design points** against measured accuracy: `M4` is 12×
   cheaper per product than `M16` and 3800× less accurate, so narrow modes only
   pay for themselves in an application that can absorb the error.
+- **The same condition, automated.** `egraph/` is an `egg` optimiser carrying
+  bitwidth as an e-class analysis, applying distributivity only where the
+  intermediate fits. Removing the guard factors two more cases and halves the
+  cost — producing exactly the circuits the solver refutes.
 - **Posit is second in both columns.** Fixed point wins on a bounded range and
   fails on a wide one; posit(16,1) beats binary16 near 1 and loses to it across
   8 decades. Tapered accuracy is a bet on where the data sits.

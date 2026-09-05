@@ -106,6 +106,36 @@ here, and inventing a cost model to fill the column would be worse than leaving
 it empty. Only the fixed-point row has hardware behind it, and that hardware is
 in `results/dse.csv`.
 
+## Automating it: the same condition as an e-graph rewrite
+
+`egraph/` is a small `egg` optimiser that carries bitwidth as an e-class
+analysis and applies distributivity **only where the intermediate fits**. It is
+the automated form of the section above, and the mechanism behind the
+"sufficient condition" column of ARITH 2022's rewrite table.
+
+```
+operands         datapath  guarded: extracted    cost   unguarded: extracted  cost
+a:8,b:8,c:8            16  (* a (+ b c))          110   (* a (+ b c))          110   sum needs 9 of 16  -- sound
+a:8,b:15,c:15          16  (* a (+ b c))          110   (* a (+ b c))          110   sum needs 16 of 16 -- sound
+a:8,b:16,c:16          16  (+ (* a b) (* a c))    210   (* a (+ b c))          110   sum needs 17 of 16 -- BLOCKED
+a:4,b:32,c:32          32  (+ (* a b) (* a c))    210   (* a (+ b c))          110   sum needs 33 of 32 -- BLOCKED
+```
+
+The analysis propagates bits the way the arithmetic does — a sum carries one
+bit past its widest operand, a product needs the sum of its operands' widths —
+and `merge` takes the tighter of two bounds, since both are valid.
+
+Running the *same* rewrite with its guard removed factors two more cases and
+halves the cost. Those two circuits are exactly the ones `dist_narrow.sby`
+refutes: smaller, cheaper by the cost model, and wrong. **The guard is not a
+conservatism knob; it is the difference between an optimiser and a bug
+generator** — which is why the interesting part of automated datapath rewriting
+is the side-conditions rather than the search.
+
+The cost model is deliberately crude (multiplier 100, adder 10). It only has to
+rank one multiply against two; ARITH 2022 uses a two-input-gate estimate
+parameterised by operand width, and validates it against logic synthesis.
+
 ## Limits
 
 - The accuracy study quantises the *inputs* and accumulates in double. Real
@@ -113,6 +143,10 @@ in `results/dse.csv`.
   small effect here but not a zero one.
 - Two workloads is not a survey. The point is that the ranking depends on the
   distribution, not that these two distributions are representative.
-- `dse.sh` explores a space someone hand-wrote. It does not *generate*
-  architectures — the rewriting-based approaches this note cites do, and that
-  gap is the interesting one.
+- `dse.sh` explores a space someone hand-wrote. The `egraph/` optimiser does
+  generate alternatives, but over one rewrite on scalar expressions — not over
+  the RTL that `dse.sh` synthesises. Closing that loop, so the extracted
+  expression becomes the design that gets measured, is the real gap.
+- The width analysis tracks an upper bound, not a range. It cannot see that
+  `b+c` fits because `b` and `c` happen to be small at runtime — only that
+  their declared widths allow it.
