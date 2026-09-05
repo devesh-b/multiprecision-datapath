@@ -9,6 +9,10 @@ two baselines through both a technology-independent flow (Yosys + ABC) and a
 real FPGA flow (Vivado, Artix-7). The interesting part is that **the two flows
 disagree**, twice, and the generic-cell flow is the one that gets it wrong.
 
+**New here?** [TUTORIAL.md](TUTORIAL.md) explains everything in this repository
+from first principles — binary numbers up to the results — assuming no prior
+hardware background.
+
 Full design notes, numbers and analysis: **[DESIGN.md](DESIGN.md)**.
 Design-space exploration, number formats and a conditional rewrite: **[DSE.md](DSE.md)**.
 Standalone adder width study: **[SWEEP.md](SWEEP.md)**.
