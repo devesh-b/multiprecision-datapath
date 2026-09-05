@@ -1,21 +1,22 @@
 # V1 (mpmac_split) == V2 (mpmac_shared), all modes, all inputs, all state.
 #
-# Both instantiate the same mp_frontend, so eqy matches the 16 sub-products and
-# the remaining obligation is "do these two reduction networks compute the same
-# next state" -- not "are two 16x16 multipliers equal", which is the query that
-# does not close.
+# Compared through the tie-off wrappers rather than the raw modules. Both
+# designs expose a `prod` observation port for the per-mode proofs in mode*.sby;
+# comparing that port as well turns this into a 16x16 multiplier equivalence,
+# which is the query that does not close. The accumulator is the specification,
+# the product is instrumentation, and only the specification needs proving here.
 
 [options]
 
 [gold]
-read -sv ../rtl/mpmac.v
-prep -top mpmac_split -flatten
-rename mpmac_split mpmac
+read -sv ../rtl/adders.v ../rtl/mpmac.v ../tb/dut_wrap.v
+prep -top dut_split -flatten
+rename dut_split mpmac
 
 [gate]
-read -sv ../rtl/mpmac.v
-prep -top mpmac_shared -flatten
-rename mpmac_shared mpmac
+read -sv ../rtl/adders.v ../rtl/mpmac.v ../tb/dut_wrap.v
+prep -top dut_shared -flatten
+rename dut_shared mpmac
 
 [strategy simple]
 use sat

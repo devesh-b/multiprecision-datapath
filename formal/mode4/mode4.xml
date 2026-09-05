@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2026-09-05T21:24:09" hostname="pop-os" package="mode4" id="0" name="default" tests="4" errors="0" failures="0" time="0" skipped="0">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="PASS"/>
+</properties>
+<testcase classname="default" name="build execution" time="0">
+</testcase>
+<testcase classname="default" name="Property ASSERT in miter_mode4 at miter_mode4.v:21.5-21.34" time="0" type="ASSERT" location="miter_mode4.v:21.5-21.34" id="_witness_.check_assert_miter_mode4_v_21_19">
+</testcase>
+<testcase classname="default" name="Property ASSERT in miter_mode4 at miter_mode4.v:22.5-22.35" time="0" type="ASSERT" location="miter_mode4.v:22.5-22.35" id="_witness_.check_assert_miter_mode4_v_22_21">
+</testcase>
+<testcase classname="default" name="Property ASSERT in miter_mode4 at miter_mode4.v:23.5-23.35" time="0" type="ASSERT" location="miter_mode4.v:23.5-23.35" id="_witness_.check_assert_miter_mode4_v_23_23">
+</testcase>
+<testcase classname="default" name="Property ASSERT in miter_mode4 at miter_mode4.v:24.5-24.35" time="0" type="ASSERT" location="miter_mode4.v:24.5-24.35" id="_witness_.check_assert_miter_mode4_v_24_25">
+</testcase>
+<system-out>SBY 21:24:08 [mode4] Removing directory '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode4'.
+SBY 21:24:08 [mode4] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/miter_mode4.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode4/src/miter_mode4.v'.
+SBY 21:24:08 [mode4] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/../rtl/adders.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode4/src/adders.v'.
+SBY 21:24:08 [mode4] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/../rtl/mpmac.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode4/src/mpmac.v'.
+SBY 21:24:08 [mode4] engine_0: smtbmc z3
+SBY 21:24:08 [mode4] base: starting process &quot;cd mode4/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 21:24:08 [mode4] base: finished (returncode=0)
+SBY 21:24:08 [mode4] prep: starting process &quot;cd mode4/model; yosys -ql design_prep.log design_prep.ys&quot;
+SBY 21:24:08 [mode4] prep: finished (returncode=0)
+SBY 21:24:08 [mode4] smt2: starting process &quot;cd mode4/model; yosys -ql design_smt2.log design_smt2.ys&quot;
+SBY 21:24:08 [mode4] smt2: finished (returncode=0)
+SBY 21:24:08 [mode4] engine_0: starting process &quot;cd mode4; yosys-smtbmc -s z3 --presat --noprogress -t 1  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2&quot;
+SBY 21:24:08 [mode4] engine_0: ##   0:00:00  Solver: z3
+SBY 21:24:08 [mode4] engine_0: ##   0:00:00  Checking assumptions in step 0..
+SBY 21:24:08 [mode4] engine_0: ##   0:00:00  Checking assertions in step 0..
+SBY 21:24:09 [mode4] engine_0: ##   0:00:00  Status: passed
+SBY 21:24:09 [mode4] engine_0: finished (returncode=0)
+SBY 21:24:09 [mode4] engine_0: Status returned by engine: pass
+SBY 21:24:09 [mode4] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 21:24:09 [mode4] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 21:24:09 [mode4] summary: engine_0 (smtbmc z3) returned pass
+SBY 21:24:09 [mode4] summary: engine_0 did not produce any traces
+SBY 21:24:09 [mode4] DONE (PASS, rc=0)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>

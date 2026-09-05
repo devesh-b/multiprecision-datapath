@@ -1,0 +1,4 @@
+W,design,cells_abc,depth_abc,ff
+16,mpmac_gen,4322,250,48
+16,mac_sep_gen,4398,255,144
+32,mpmac_gen,17822,646,96

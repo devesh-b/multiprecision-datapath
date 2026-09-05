@@ -64,8 +64,8 @@ modes buy lanes, so raw cell count hides half the trade:
 | mode | best variant | cells/product | RMS relative error |
 |---|---|---|---|
 | `M16` | shared / rca | 2641.0 | 4.91e-04 |
-| `M8`  | split / infer | 761.5 | 1.08e-01 |
-| `M4`  | split / infer | 223.0 | 1.88e+00 |
+| `M8`  | split / infer | 733.5 | 1.08e-01 |
+| `M4`  | split / infer | 223.5 | 1.88e+00 |
 
 **`M4` is 12× cheaper per product than `M16` and 3800× less accurate.** On a
 general length-64 dot product a 4-bit lane produces a 188% RMS error, which is

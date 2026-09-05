@@ -215,7 +215,12 @@ module mpmac_shared #(
   input  wire [1:0]  mode,
   input  wire [15:0] a,
   input  wire [15:0] b,
-  output wire [47:0] acc
+  output wire [47:0] acc,
+  // Placed product, exposed for the per-mode proofs in formal/mode*.sby. Free
+  // here -- it is the reduction tree's own output. mpmac_split does NOT expose
+  // it: there the product only exists muxed across three networks, so the port
+  // would add a 48-bit 3:1 mux and distort the area comparison it feeds.
+  output wire [47:0] prod
 );
   reg [47:0] q;
   assign acc = q;
@@ -231,8 +236,8 @@ module mpmac_shared #(
       for (j = 0; j < 4; j = j + 1) begin : tcol
         localparam integer K   = 4*i + j;
         localparam integer L8  = i / 2;                 // M8 lane of this term
-        localparam integer OK8 = ((i/2) == (j/2));      // enabled in M8?
-        localparam integer OK4 = (i == j);              // enabled in M4?
+        localparam integer OK8 = ((i/2) == (j/2)) ? 1 : 0;  // enabled in M8?
+        localparam integer OK4 = (i == j) ? 1 : 0;          // enabled in M4?
 
         wire [9:0]  p    = pp[K*10 +: 10];
         wire        sbit = p[9];
@@ -242,15 +247,15 @@ module mpmac_shared #(
         // M8: sign-extend inside 24 bits, weight 4*(i+j-4L), then place at 24L
         // shift amount is only meaningful when the term is in-lane; guard it
         // so a masked-off term never elaborates a negative shift
-        localparam integer SH8 = OK8 ? (4*(i + j - 4*L8)) : 0;
+        localparam integer SH8 = (OK8 != 0) ? (4*(i + j - 4*L8)) : 0;
         wire [23:0] v8  = {{14{sbit}}, p} << SH8;
-        wire [47:0] t8  = OK8 ? ({24'd0, v8} << (24*L8)) : 48'd0;
+        wire [47:0] t8  = (OK8 != 0) ? ({24'd0, v8} << (24*L8)) : 48'd0;
         // M4: diagonal only, sign-extend inside 12 bits, place at 12i
         wire [11:0] v4  = {{2{sbit}}, p};
-        wire [47:0] t4  = OK4 ? ({36'd0, v4} << (12*i)) : 48'd0;
+        wire [47:0] t4  = (OK4 != 0) ? ({36'd0, v4} << (12*i)) : 48'd0;
 
         assign term[K] = (mode == `MODE_M16) ? t16 :
-                         (mode == `MODE_M8 ) ? (OK8 ? t8 : 48'd0) : t4;
+                         (mode == `MODE_M8 ) ? ((OK8 != 0) ? t8 : 48'd0) : t4;
       end
     end
   endgenerate
@@ -275,6 +280,7 @@ module mpmac_shared #(
     end
   endgenerate
   seg_add48 #(CPA) u4  (.x(l3[0]), .y(l3[1]), .mode(mode), .s(l4));
+  assign prod = l4;
   seg_add48 #(CPA) uac (.x(l4),    .y(q),     .mode(mode), .s(nxt));
 
   always @(posedge clk) begin
@@ -306,7 +312,7 @@ module mpmac_locked #(
     if (ARCH == 0) begin : g_shared
       mpmac_shared #(.CPA(CPA)) u (
         .clk(clk), .rst(rst), .en(en), .sgn(sgn), .mode(MODE),
-        .a(a), .b(b), .acc(acc));
+        .a(a), .b(b), .acc(acc), .prod());
     end else begin : g_split
       // mpmac_split has no swappable CPA; it is one point, not a family
       mpmac_split u (
@@ -322,12 +328,12 @@ module mpmac_rca (
   input wire clk, rst, en, sgn, input wire [1:0] mode,
   input wire [15:0] a, b, output wire [47:0] acc);
   mpmac_shared #(.CPA(1)) u (.clk(clk), .rst(rst), .en(en), .sgn(sgn),
-                             .mode(mode), .a(a), .b(b), .acc(acc));
+                             .mode(mode), .a(a), .b(b), .acc(acc), .prod());
 endmodule
 
 module mpmac_ksa (
   input wire clk, rst, en, sgn, input wire [1:0] mode,
   input wire [15:0] a, b, output wire [47:0] acc);
   mpmac_shared #(.CPA(2)) u (.clk(clk), .rst(rst), .en(en), .sgn(sgn),
-                             .mode(mode), .a(a), .b(b), .acc(acc));
+                             .mode(mode), .a(a), .b(b), .acc(acc), .prod());
 endmodule

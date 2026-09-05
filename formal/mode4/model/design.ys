@@ -1,0 +1,10 @@
+# running in mode4/src/
+read -formal adders.v
+read -formal mpmac.v
+read -formal miter_mode4.v
+prep -top miter_mode4
+
+hierarchy -smtcheck
+rename -witness
+write_jny -no-connections ../model/design.json
+write_rtlil ../model/design.il

@@ -8,8 +8,8 @@ shared,rca,M4,4,1046,57,1040,57
 shared,ksa,M16,1,5353,354,3152,283
 shared,ksa,M8,2,2542,166,1692,135
 shared,ksa,M4,4,1274,74,990,57
-split,infer,M16,1,4379,274,2675,241
-split,infer,M8,2,1988,132,1523,127
-split,infer,M4,4,1026,62,892,57
+split,infer,M16,1,4379,274,2644,241
+split,infer,M8,2,1988,132,1467,127
+split,infer,M4,4,1026,62,894,58
 baseline,-,all,1,4534,275,4333,261
 baseline,-,all,1,2515,274,2454,264

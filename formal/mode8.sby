@@ -1,0 +1,17 @@
+[options]
+mode bmc
+depth 1
+
+[engines]
+smtbmc z3
+
+[script]
+read -formal adders.v
+read -formal mpmac.v
+read -formal miter_mode8.v
+prep -top miter_mode8
+
+[files]
+miter_mode8.v
+../rtl/adders.v
+../rtl/mpmac.v

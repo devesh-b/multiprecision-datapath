@@ -1,0 +1,24 @@
+SBY 21:24:17 [mode8] Removing directory '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode8'.
+SBY 21:24:17 [mode8] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/miter_mode8.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode8/src/miter_mode8.v'.
+SBY 21:24:17 [mode8] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/../rtl/adders.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode8/src/adders.v'.
+SBY 21:24:17 [mode8] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/../rtl/mpmac.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode8/src/mpmac.v'.
+SBY 21:24:18 [mode8] engine_0: smtbmc z3
+SBY 21:24:18 [mode8] base: starting process "cd mode8/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 21:24:18 [mode8] base: finished (returncode=0)
+SBY 21:24:18 [mode8] prep: starting process "cd mode8/model; yosys -ql design_prep.log design_prep.ys"
+SBY 21:24:18 [mode8] prep: finished (returncode=0)
+SBY 21:24:18 [mode8] smt2: starting process "cd mode8/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 21:24:18 [mode8] smt2: finished (returncode=0)
+SBY 21:24:18 [mode8] engine_0: starting process "cd mode8; yosys-smtbmc -s z3 --presat --noprogress -t 1  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2"
+SBY 21:24:18 [mode8] engine_0: ##   0:00:00  Solver: z3
+SBY 21:24:18 [mode8] engine_0: ##   0:00:00  Checking assumptions in step 0..
+SBY 21:24:18 [mode8] engine_0: ##   0:00:00  Checking assertions in step 0..
+SBY 21:25:18 [mode8] engine_0: ##   0:01:00  waiting for solver (1 minute)
+SBY 21:27:28 [mode8] engine_0: ##   0:03:10  Status: passed
+SBY 21:27:28 [mode8] engine_0: finished (returncode=0)
+SBY 21:27:28 [mode8] engine_0: Status returned by engine: pass
+SBY 21:27:28 [mode8] summary: Elapsed clock time [H:MM:SS (secs)]: 0:03:10 (190)
+SBY 21:27:28 [mode8] summary: Elapsed process time [H:MM:SS (secs)]: 0:03:10 (190)
+SBY 21:27:28 [mode8] summary: engine_0 (smtbmc z3) returned pass
+SBY 21:27:28 [mode8] summary: engine_0 did not produce any traces
+SBY 21:27:28 [mode8] DONE (PASS, rc=0)

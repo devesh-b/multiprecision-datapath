@@ -60,7 +60,8 @@ inferred `+`, `rca`, or `ksa` from `rtl/adders.v` (`mpmac_rca`, `mpmac_ksa`).
 | `mpmac_shared` (V2) vs same golden | 1,467,310 checks, 0 errors |
 | `mpmac_rca`, `mpmac_ksa` vs same golden | 1,467,310 checks each, 0 errors |
 | `mac_separate` (B1) vs same golden | 1,467,310 checks, 0 errors |
-| **V1 ≡ V2** | **`eqy`: proved equivalent**, 341 partitions, 141 s |
+| **V1 ≡ V2** | **`eqy`: proved equivalent**, 444 s |
+| **`M4`, `M8` ≡ dedicated units** | **`sby` + z3: PASS** (see below) |
 | **inferred `+` ≡ `rca` ≡ `ksa`** | **`sby` + z3: PASS**, exhaustive, < 1 s |
 
 The testbench golden slices the operands and multiplies with `*`; it shares no
@@ -105,6 +106,30 @@ three MACs equivalent by substitution. As a combinational miter
 Picking the right proof granularity was worth more than any solver tuning
 here — the same lesson `SWEEP.md` records about `abc` not inventing structure.
 
+### Per-mode equivalence against dedicated units
+
+The testbench shows the design agrees with a golden model. That is not the same
+as proving each *mode* implements the dedicated multiplier it claims to. The
+product network is exposed on `mpmac_shared` as a `prod` port and compared
+against dedicated multipliers, one miter per mode (`formal/mode*.sby`):
+
+| mode | obligation | result |
+|---|---|---|
+| `M4` | 4 lanes × dedicated 4×4, packed into 12-bit lanes | **PASS** |
+| `M8` | 2 lanes × dedicated 8×8, packed into 24-bit lanes | **PASS** |
+| `M16` | 1 × dedicated 16×16 in 48 bits | **did not close** — >10 min in the solver |
+
+`M16` failing to close is not a defect in the design; it is the same wall the
+conditional-rewrite proof hits at `W=8` (see `DSE.md`). Multiplier equivalence
+is the classic hard case for bit-blasting SMT, and 16×16 is past where z3 gets
+there. The honest position is that two of the three modes are proved and the
+third is covered by 1,467,310 directed vectors.
+
+`mpmac_split` deliberately does **not** expose `prod`. There the product only
+exists muxed across three networks, so the port would add a 48-bit 3:1 mux —
+152 cells — and distort the very area comparison it feeds. Instrumentation that
+changes the measurement is worse than no instrumentation.
+
 ## Numbers, part 1 — Yosys generic cells
 
 Yosys 0.68 + ABC, generic `AND/OR/XOR`, `flatten` before `techmap`, same flow
@@ -113,12 +138,12 @@ as `sweep.sh`.
 | design | as-written cells/depth | after ABC cells/depth | FF bits | logic cells |
 |---|---|---|---|---|
 | `mpmac_split`  V1 | 7789 / 345 | 4886 / 388 | 48 | 4838 |
-| `mpmac_shared` V2 | 6997 / 293 | **4435 / 274** | 48 | 4387 |
+| `mpmac_shared` V2 | 6997 / 289 | **4400 / 270** | 48 | 4352 |
 | `mac_separate` B1 | 4534 / 275 | 4333 / 261 | **144** | 4189 |
 | `mac_fixed16`  B2 | 2515 / 274 | 2454 / 264 | 48 | 2406 |
 
-Read on its own this says: V2 beats V1 by 9.2% in cells and 29.4% in depth,
-and loses to seven dedicated units by 2.4%. **Both halves of that reading turn
+Read on its own this says: V2 beats V1 by 9.9% in cells and 30.4% in depth,
+and loses to seven dedicated units by 1.5%. **Both halves of that reading turn
 out to be wrong on real fabric.** Generic-cell counting scores a flip-flop the
 same as an AND gate and knows nothing about carry chains or hard macros.
 
@@ -132,9 +157,9 @@ same as an AND gate and knows nothing about carry chains or hard macros.
 
 The three-way split matters. Making the sub-multipliers signed costs 256 cells;
 making the mode and signedness *runtime-selectable* costs another 1218 — nearly
-five times as much, and 27% of the whole design. For scale, the front end is
-2570 of V2's 4435 cells (58%); everything else — placement, the segmented adder
-tree and the accumulate — is the remaining 1865 (42%). The part the two
+five times as much, and 28% of the whole design. For scale, the front end is
+2570 of V2's 4400 cells (58%); everything else — placement, the segmented adder
+tree and the accumulate — is the remaining 1830 (42%). The part the two
 architectures argue about is not where the money is. The reason is specialisation: with
 `mode` and `sgn` fixed, twelve of the sixteen sub-multipliers collapse to
 narrow unsigned units, and only the top-digit ones stay 5×5 signed. A runtime
@@ -247,11 +272,10 @@ is the answer, because inferred `+` reaches the carry chain and they do not.
   for 32- and 64-bit operands would test whether the shared-vs-separate verdict
   moves — the register saving scales with lane count while the runtime-mode
   overhead scales with digit count, so a crossover is plausible but unmeasured.
-- **No per-mode proof against a dedicated unit.** Each mode ought to be proved
-  equivalent to a dedicated fixed-width MAC — `M4` exhaustively, `M8`/`M16` via
-  `eqy`. What exists instead is `mac_separate` passing the same testbench, which
-  is agreement under a reset discipline, not equivalence (see the caveat above).
-  Not done.
+- **The `M16` per-mode proof does not close.** `M4` and `M8` are proved (see
+  below); `M16` sat in the solver for over ten minutes without returning, which
+  is the expected behaviour for a 16×16 multiplier equivalence and the same wall
+  the `W=8` distributivity proof hits.
 - **No place-and-route.** Post-synthesis timing only; routing will move the
   numbers, and the CARRY4 story especially.
 - **`ltp` is a proxy.** ABC raises V1's depth (345 → 388) while cutting cells,

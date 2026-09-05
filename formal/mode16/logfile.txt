@@ -1,0 +1,20 @@
+SBY 21:27:45 [mode16] Removing directory '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode16'.
+SBY 21:27:45 [mode16] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/miter_mode16.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode16/src/miter_mode16.v'.
+SBY 21:27:45 [mode16] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/../rtl/adders.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode16/src/adders.v'.
+SBY 21:27:45 [mode16] Copy '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/../rtl/mpmac.v' to '/home/devesh/MSc_Prep/arith/multiprecision-datapath/formal/mode16/src/mpmac.v'.
+SBY 21:27:45 [mode16] engine_0: smtbmc z3
+SBY 21:27:45 [mode16] base: starting process "cd mode16/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 21:27:45 [mode16] base: finished (returncode=0)
+SBY 21:27:45 [mode16] prep: starting process "cd mode16/model; yosys -ql design_prep.log design_prep.ys"
+SBY 21:27:45 [mode16] prep: finished (returncode=0)
+SBY 21:27:45 [mode16] smt2: starting process "cd mode16/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 21:27:45 [mode16] smt2: finished (returncode=0)
+SBY 21:27:45 [mode16] engine_0: starting process "cd mode16; yosys-smtbmc -s z3 --presat --noprogress -t 1  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2"
+SBY 21:27:45 [mode16] engine_0: ##   0:00:00  Solver: z3
+SBY 21:27:45 [mode16] engine_0: ##   0:00:00  Checking assumptions in step 0..
+SBY 21:27:46 [mode16] engine_0: ##   0:00:00  Checking assertions in step 0..
+SBY 21:28:46 [mode16] engine_0: ##   0:01:00  waiting for solver (1 minute)
+SBY 21:32:46 [mode16] engine_0: ##   0:05:00  waiting for solver (5 minutes)
+SBY 21:37:46 [mode16] engine_0: ##   0:10:00  waiting for solver (10 minutes)
+SBY 21:42:46 [mode16] engine_0: ##   0:15:00  waiting for solver (15 minutes)
+SBY 21:42:52 [mode16] engine_0: terminating process
